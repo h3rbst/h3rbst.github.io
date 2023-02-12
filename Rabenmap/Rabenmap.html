@@ -106,14 +106,16 @@
             xmlhttp.onreadystatechange = function () {
                 if (this.readyState == 4 && this.status == 200) {
                     data = JSON.parse(this.responseText);
-                    data.feed.entry.forEach(element => {
-                        console.log(element.gsx$flurstück.$t);
-                        document.getElementById("flst_" + element.gsx$flurstück.$t).classList.add("flurstueck_mitDaten");
-                        document.getElementById("flst_" + element.gsx$flurstück.$t).classList.remove("flurstueck");
+                    data.values.shift();
+                    data.values.forEach(element => {
+                        console.log("flst_" + element[2]);
+                        document.getElementById("flst_" + element[2]).classList.add("flurstueck_mitDaten");
+                        document.getElementById("flst_" + element[2]).classList.remove("flurstueck");
                     });
                 }
             };
-            xmlhttp.open("GET", "https://spreadsheets.google.com/feeds/list/1bC9gUrPT1hNG0Ivv-KGhwS_Y5LqOqs_wlcFxcuywYrw/ooyn37w/public/values?alt=json", true);
+            // https://spreadsheets.google.com/feeds/list/1bC9gUrPT1hNG0Ivv-KGhwS_Y5LqOqs_wlcFxcuywYrw/ooyn37w/public/values?alt=json
+            xmlhttp.open("GET", "https://sheets.googleapis.com/v4/spreadsheets/1bC9gUrPT1hNG0Ivv-KGhwS_Y5LqOqs_wlcFxcuywYrw/values/Formularantworten?alt=json&key=AIzaSyD6hV_0T96LHawsIqDXawa-1vP3fDLDYDA", true);
             xmlhttp.send();
         }
 
@@ -134,18 +136,19 @@
             var flurDetails = document.getElementById("flurDetails");
             flurDetails.style.display = "block";
             console.log(flurstueck);
-            var index = data.feed.entry.findIndex(x => x.gsx$flurstück.$t == flurstueck);
+            var index = data.values.findIndex(x => x[2] == flurstueck);
+            console.log(index);
             if (index == -1) {
                 return;
             }
-            document.getElementById("name").innerHTML = data.feed.entry[index].gsx$name.$t;
-            document.getElementById("flurstueck").innerHTML = "Flurstück " + data.feed.entry[index].gsx$flurstück.$t;
-            document.getElementById("adresse").innerHTML = data.feed.entry[index].gsx$adresse.$t;
-            document.getElementById("mail").innerHTML = data.feed.entry[index].gsx$email.$t;
-            document.getElementById("mail").href = "mailto:" + data.feed.entry[index].gsx$email.$t;
-            document.getElementById("phone").innerHTML = data.feed.entry[index].gsx$telefon.$t;
-            document.getElementById("phone").href = "tel:" + data.feed.entry[index].gsx$telefon.$t;
-            var bild = data.feed.entry[index].gsx$bild.$t.replace("https://drive.google.com/open?id=", "");
+            document.getElementById("name").innerHTML = data.values[index][1];
+            document.getElementById("flurstueck").innerHTML = "Flurstück " + data.values[index][2];
+            document.getElementById("adresse").innerHTML = data.values[index][3];
+            document.getElementById("mail").innerHTML = data.values[index][4];
+            document.getElementById("mail").href = "mailto:" + data.values[index][4];
+            document.getElementById("phone").innerHTML = data.values[index][5];
+            document.getElementById("phone").href = "tel:" + data.values[index][5];
+            var bild = data.values[index][6].replace("https://drive.google.com/open?id=", "");
             if (bild == "") {
                 document.getElementById("picture").src = null;
                 document.getElementById("picture").style.visibility = "hidden";
